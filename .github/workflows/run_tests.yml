@@ -9,16 +9,15 @@ on:
         type: choice
         default: smoke
         options:
-          - negative
-          - all
           - smoke
           - regression
           - extended
-          
+          - all
+
 permissions:
   contents: read
   pages: write
-  id-token: write         
+  id-token: write
 
 jobs:
   run-tests:
@@ -30,27 +29,30 @@ jobs:
       - name: Set up Python environment
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+         python-version: '3.10'
       - name: Install dependencies.
         run: pip install -r requirements.txt
-        
+
+      - name: Install Playwright
+        run: playwright install
+
       - name: run all tests
         if: "github.event.inputs.deployment_target == 'all'"
         run: pytest --alluredir=allure-results
         continue-on-error: true
-        
+
       - name: run smoke tests
         if: "github.event.inputs.deployment_target == 'smoke'"
         run: pytest -m smoke --alluredir=allure-results
         continue-on-error: true
-        
+
       - name: run regression tests
         if: "github.event.inputs.deployment_target == 'regression'"
-        run: pytest -m regression --alluredir=allure-results 
+        run: pytest -m regression --alluredir=allure-results
         continue-on-error: true
-        
+
       - name: run extended tests
-        if: "github.event.inputs.deployment_target == 'extended'" 
+        if: "github.event.inputs.deployment_target == 'extended'"
         run: pytest -m extended --alluredir=allure-results
         continue-on-error: true
 
@@ -59,19 +61,19 @@ jobs:
         with:
           distribution: 'microsoft'
           java-version: '17'
-          
+
       - name: Install Allure
         run: sudo wget https://github.com/allure-framework/allure2/releases/download/2.30.0/allure-2.30.0.tgz && sudo tar -zxvf allure-2.30.0.tgz -C /opt/ && sudo ln -s /opt/allure-2.30.0/bin/allure /usr/bin/allure
       - name: Generate report
         run: allure generate -c allure-results -o _site
-        
+
       - name: Save allure report
         uses: actions/upload-artifact@v3
         with:
           name: _site
           path: _site
-          retention-days: 1 
-          
+          retention-days: 1
+
   publish-report:
     name: Report publication
     runs-on: ubuntu-latest
@@ -84,5 +86,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1.2.9
-        
-  
