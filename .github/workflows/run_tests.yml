@@ -84,7 +84,7 @@ jobs:
     needs: run-tests
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v3  # Проверенная версия
+        uses: actions/download-artifact@v4  # Проверенная версия
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v1  # Используется v1, так как v2 может не существовать
       - name: Deploy to GitHub Pages
